@@ -140,6 +140,11 @@ module Statesman
                 "Cannot transition from '#{from}' to '#{to}'"
         end
       end
+      
+      def draw(class_name)
+        klass = Object.const_get(class_name)
+        klass.state_machine.draw
+      end
 
       private
 
