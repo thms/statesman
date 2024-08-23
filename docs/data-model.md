@@ -38,8 +38,8 @@ class Statesman::Adapters::ActiveRecord {
 }
 
 class Statesman::Adapters::MongoidTransition {
-  + metadata : Hash
-  + initialize(to : String, sort_key : Integer, metadata : Hash)
+  + statesman_metadata : Hash
+  + initialize(to : String, sort_key : Integer, statesman_metadata : Hash)
 }
 
 class Statesman::Adapters::Mongoid {
@@ -109,24 +109,6 @@ class Statesman::Config {
   + storage_adapter(adapter_class : Class) : void
 }
 
-class Statesman::EventTransitions {
-  + machine : Statesman::Machine
-  + event_name : String
-  + initialize(machine : Statesman::Machine, event_name : String, block : Proc)
-  + transition(options : Hash) : void
-}
-
-class Statesman::GeneratorHelpers {
-  + class_name_option : String
-  + model_file_name : String
-  + migration_class_name : String
-  + next_migration_number : String
-  + parent_name : String
-  + parent_id : String
-  + table_name : String
-  + mysql? : Boolean
-}
-
 Statesman::Adapters::MemoryTransition --|> Statesman::Callback
 Statesman::Adapters::ActiveRecordTransition --|> Statesman::Callback
 Statesman::Adapters::MongoidTransition --|> Statesman::Callback
@@ -134,8 +116,10 @@ Statesman::Guard --|> Statesman::Callback
 Statesman::Machine *-- Statesman::Adapters::Memory
 Statesman::Machine *-- Statesman::Adapters::ActiveRecord
 Statesman::Machine *-- Statesman::Adapters::Mongoid
-Statesman::Machine *-- Statesman::EventTransitions
-Statesman::Machine *-- Statesman::GeneratorHelpers
-Statesman::Machine *-- Statesman::Config
+Statesman::Machine *-- Statesman::Callback
+Statesman::Machine *-- Statesman::Guard
+Statesman::Config *-- Statesman::Adapters::Memory
+Statesman::Config *-- Statesman::Adapters::ActiveRecord
+Statesman::Config *-- Statesman::Adapters::Mongoid
 @enduml
 ```
