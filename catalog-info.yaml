@@ -1,0 +1,16 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: statesman
+  annotations:
+    github.com/project-slug: thms/statesman
+    backstage.io/techdocs-ref: dir:.
+  links:
+    - title: Getting Started
+      url: https://github.com/thms/statesman/README.md
+      type: Readme
+      icon: github
+spec:
+  type: library
+  lifecycle: stable
+  owner: thms
