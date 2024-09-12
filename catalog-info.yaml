@@ -11,6 +11,6 @@ metadata:
       type: Readme
       icon: github
 spec:
-  type: component
+  type: library
   lifecycle: production
   owner: thms

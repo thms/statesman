@@ -1,125 +1,86 @@
-```plantuml
-@startuml
-class Statesman::Adapters::MemoryTransition {
-  + created_at : Time
-  + updated_at : Time
-  + to_state : String
-  + sort_key : Integer
-  + metadata : Hash
-  + initialize(to : String, sort_key : Integer, metadata : Hash)
-}
+Based on the provided codebase, which primarily consists of Ruby files related to the Statesman library, I will outline a UML class diagram to represent the data model. The codebase includes adapter classes for ActiveRecord and Mongoid, generator helpers, and migration templates. Here is the UML class diagram in markdown format:
 
-class Statesman::Adapters::Memory {
-  + transition_class : Class
-  + history : Array<Statesman::Adapters::MemoryTransition>
-  + parent_model : Object
-  + initialize(transition_class : Class, parent_model : Object, observer : Statesman::Machine)
-  + create(from : String, to : String, metadata : Hash) : Statesman::Adapters::MemoryTransition
-  + last : Statesman::Adapters::MemoryTransition
-  - next_sort_key : Integer
-}
+```markdown
+# UML Class Diagram for Statesman Codebase
 
-class Statesman::Adapters::ActiveRecordTransition {
-  + metadata : Hash
-  + initialize(to : String, sort_key : Integer, metadata : Hash)
-}
+## Classes
 
-class Statesman::Adapters::ActiveRecord {
-  + transition_class : Class
-  + parent_model : Object
-  + initialize(transition_class : Class, parent_model : Object, observer : Statesman::Machine)
-  + create(from : String, to : String, metadata : Hash) : Statesman::Adapters::ActiveRecordTransition
-  + history : Array<Statesman::Adapters::ActiveRecordTransition>
-  + last : Statesman::Adapters::ActiveRecordTransition
-  - create_transition(from : String, to : String, metadata : Hash) : Statesman::Adapters::ActiveRecordTransition
-  - transitions_for_parent : ActiveRecord::Relation
-  - next_sort_key : Integer
-  - serialized?(transition_class : Class) : Boolean
-}
+### Statesman::Adapters::ActiveRecordTransition
+- +included(base: Class): void
 
-class Statesman::Adapters::MongoidTransition {
-  + statesman_metadata : Hash
-  + initialize(to : String, sort_key : Integer, statesman_metadata : Hash)
-}
+### Statesman::GeneratorHelpers
+- +class_name_option: String
+- +model_file_name: String
+- +migration_class_name: String
+- +next_migration_number: String
+- +parent_name: String
+- +parent_id: String
+- +table_name: String
+- +mysql?: Boolean
 
-class Statesman::Adapters::Mongoid {
-  + transition_class : Class
-  + parent_model : Object
-  + initialize(transition_class : Class, parent_model : Object, observer : Statesman::Machine)
-  + create(from : String, to : String, metadata : Hash) : Statesman::Adapters::MongoidTransition
-  + history : Mongoid::Criteria
-  + last : Statesman::Adapters::MongoidTransition
-  - transition_class_hash_fields : Array<String>
-  - metadata_field_error_message : String
-  - transitions_for_parent : Mongoid::Criteria
-  - next_sort_key : Integer
-}
+### Statesman::Adapters::ActiveRecord
+- -transition_class: Class
+- -parent_model: ActiveRecord::Base
+- -observer: Object
+- +initialize(transition_class: Class, parent_model: ActiveRecord::Base, observer: Object): void
+- +create(from: String, to: String, metadata: Hash): Object
+- +history: Array
+- +last: Object
+- -create_transition(from: String, to: String, metadata: Hash): Object
+- -transitions_for_parent: ActiveRecord::Relation
+- -next_sort_key: Integer
+- -serialized?(transition_class: Class): Boolean
 
-class Statesman::Callback {
-  + from : String
-  + to : Array<String>
-  + callback : Proc
-  + initialize(options : Hash)
-  + call(*args : Object) : Object
-  + applies_to?(options : Hash) : Boolean
-  - matches(from : String, to : String) : Boolean
-  - matches_all_transitions : Boolean
-  - matches_from_state(from : String, to : String) : Boolean
-  - matches_to_state(from : String, to : String) : Boolean
-  - matches_both_states(from : String, to : String) : Boolean
-}
+### Statesman::Adapters::Mongoid
+- -transition_class: Class
+- -parent_model: Mongoid::Document
+- -observer: Object
+- +initialize(transition_class: Class, parent_model: Mongoid::Document, observer: Object): void
+- +create(from: String, to: String, metadata: Hash): Object
+- +history: Array
+- +last: Object
+- -transition_class_hash_fields: Array
+- -metadata_field_error_message: String
+- -transitions_for_parent: Mongoid::Criteria
+- -next_sort_key: Integer
 
-class Statesman::Guard {
-  + from : String
-  + to : Array<String>
-  + callback : Proc
-  + initialize(options : Hash)
-  + call(*args : Object) : Object
-}
+### Statesman::Adapters::MemoryTransition
+- +created_at: DateTime
+- +updated_at: DateTime
+- +to_state: String
+- +sort_key: Integer
+- +metadata: Hash
+- +initialize(to: String, sort_key: Integer, metadata: Hash): void
 
-class Statesman::Machine {
-  + object : Object
-  + transition_class : Class
-  + storage_adapter : Statesman::Adapters::Memory
-  + current_state : String
-  + allowed_transitions : Array<String>
-  + last_transition : Statesman::Adapters::MemoryTransition
-  + can_transition_to?(new_state : String, metadata : Hash) : Boolean
-  + history : Array<Statesman::Adapters::MemoryTransition>
-  + transition_to!(new_state : String, metadata : Hash) : Boolean
-  + trigger!(event_name : String, metadata : Hash) : Boolean
-  + execute(phase : Symbol, initial_state : String, new_state : String, transition : Statesman::Adapters::MemoryTransition) : void
-  + transition_to(new_state : String, metadata : Hash) : Boolean
-  + trigger(event_name : String, metadata : Hash) : Boolean
-  + available_events : Array<String>
-  - adapter_class(transition_class : Class) : Class
-  - successors_for(from : String) : Array<String>
-  - guards_for(options : Hash) : Array<Statesman::Guard>
-  - callbacks_for(phase : Symbol, options : Hash) : Array<Statesman::Callback>
-  - select_callbacks_for(callbacks : Array<Statesman::Callback>, options : Hash) : Array<Statesman::Callback>
-  - validate_transition(options : Hash) : void
-  - to_s_or_nil(input : Object) : String
-  + initialize(object : Object, options : Hash)
-  + after_initialize : void
-}
+### Statesman::ActiveRecordTransitionGenerator
+- +create_model_file: void
+- -migration_file_name: String
+- -rails_4?: Boolean
 
-class Statesman::Config {
-  + adapter_class : Class
-  + initialize(block : Proc)
-  + storage_adapter(adapter_class : Class) : void
-}
+### Statesman::Adapters::MongoidTransition
+- +included(base: Class): void
 
-Statesman::Adapters::MemoryTransition --|> Statesman::Callback
-Statesman::Adapters::ActiveRecordTransition --|> Statesman::Callback
-Statesman::Adapters::MongoidTransition --|> Statesman::Callback
-Statesman::Guard --|> Statesman::Callback
-Statesman::Machine *-- Statesman::Adapters::Memory
-Statesman::Machine *-- Statesman::Adapters::ActiveRecord
-Statesman::Machine *-- Statesman::Adapters::Mongoid
-Statesman::Machine *-- Statesman::Callback
-Statesman::Machine *-- Statesman::Guard
-Statesman::Config *-- Statesman::Adapters::Memory
-Statesman::Config *-- Statesman::Adapters::ActiveRecord
-Statesman::Config *-- Statesman::Adapters::Mongoid
-@enduml
+### Statesman::MongoidTransitionGenerator
+- +create_model_file: void
+- -collection_name: String
+
+## Associations
+
+- Statesman::Adapters::ActiveRecordTransition «include» Statesman::Adapters::ActiveRecord
+- Statesman::Adapters::MongoidTransition «include» Statesman::Adapters::Mongoid
+- Statesman::ActiveRecordTransitionGenerator «use» Statesman::GeneratorHelpers
+- Statesman::MongoidTransitionGenerator «use» Statesman::GeneratorHelpers
+
+## Notes
+
+- The `Statesman::Adapters::ActiveRecord` and `Statesman::Adapters::Mongoid` classes represent the adapters for the ActiveRecord and Mongoid ORMs, respectively.
+- The `Statesman::GeneratorHelpers` module provides helper methods for the generator classes.
+- The `Statesman::Adapters::MemoryTransition` class represents an in-memory transition, which is not persisted to a database.
+- The `Statesman::ActiveRecordTransitionGenerator` and `Statesman::MongoidTransitionGenerator` classes are Rails generators for creating migration and model files.
+- The `Statesman::Adapters::ActiveRecordTransition` and `Statesman::Adapters::MongoidTransition` modules are included in the respective transition model classes to provide additional functionality.
 ```
+
+Please note that this UML class diagram is a high-level representation and does not include all methods and attributes for brevity. It is also based on the assumption that the codebase provided is related to the Statesman library, which is a state machine library for Ruby applications.
+
+Current time in UTC: 2023-04-02 00:00:00 UTC
+My name: Software Architect and Developer
